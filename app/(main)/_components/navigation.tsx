@@ -10,7 +10,7 @@ import {
   Settings,
   Trash,
 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { ElementRef, useEffect, useRef, useState } from "react";
 import { useMediaQuery } from "usehooks-ts";
 import UserItem from "./user-item";
@@ -26,10 +26,14 @@ import {
 } from "@/components/ui/popover";
 import Trashbox from "./trash-box";
 import { useSearch } from "@/hooks/use-search";
+import { useSettings } from "@/hooks/use-settings";
+import Navbar from "./navbar";
 
 export default function Navigation() {
   const pathname = usePathname();
+  const params = useParams();
   const search = useSearch();
+  const settings = useSettings();
   const isMobile = useMediaQuery("(max-width: 768px)");
 
   const create = useMutation(api.documents.create);
@@ -154,7 +158,7 @@ export default function Navigation() {
             isSearch
             icon={Search}
           />
-          <Item onClick={() => {}} label="Settings" icon={Settings} />
+          <Item onClick={settings.onOpen} label="Settings" icon={Settings} />
           <Item onClick={handleCreate} label="New page" icon={PlusCircle} />
         </div>
         <div className="mt-4">
@@ -187,15 +191,19 @@ export default function Navigation() {
           isMobile && "left-0 w-full"
         )}
       >
-        <nav className="bg-transparent px-3 py-2 w-full">
-          {isCollapsed ? (
-            <MenuIcon
-              onClick={resetWidth}
-              role="button"
-              className="h-6 w-6 text-muted-foreground"
-            />
-          ) : null}
-        </nav>
+        {!!params.documentId ? (
+          <Navbar isCollapsed={isCollapsed} onResetWidth={resetWidth} />
+        ) : (
+          <nav className="bg-transparent px-3 py-2 w-full">
+            {isCollapsed ? (
+              <MenuIcon
+                onClick={resetWidth}
+                role="button"
+                className="h-6 w-6 text-muted-foreground"
+              />
+            ) : null}
+          </nav>
+        )}
       </div>
     </>
   );
